@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Табло · Любовная лотерея</title>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=JetBrains+Mono:wght@400;700&family=Space+Grotesk:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#060D0A; --felt:#0D1A14; --raise:#12281E; --edge:#1C3227;
+  --mint:#4ADE80; --gold:#E5B84B; --chalk:#E9F3EC; --dim:#6F8D7D;
+  --display:'Anton','Haettenschweiler','Arial Narrow',sans-serif;
+  --ui:'Space Grotesk',-apple-system,'Segoe UI',Roboto,sans-serif;
+  --mono:'JetBrains Mono',ui-monospace,Menlo,monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{background:var(--ink);color:var(--chalk);font-family:var(--ui);overflow:hidden;
+  display:flex;flex-direction:column;padding:2.2vh 2.4vw;gap:1.6vh}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+.lbl{font-family:var(--mono);font-size:clamp(9px,.85vw,15px);letter-spacing:.24em;
+  text-transform:uppercase;color:var(--dim)}
+
+/* шапка */
+header{display:flex;align-items:center;justify-content:space-between;gap:2vw;flex:none}
+.brand{display:flex;align-items:baseline;gap:1.1vw}
+.brand h1{font-family:var(--display);font-size:clamp(20px,2.5vw,44px);letter-spacing:.01em;line-height:1}
+.brand .ev{font-size:clamp(11px,1.05vw,19px);color:var(--dim)}
+#clock{font-family:var(--mono);font-size:clamp(14px,1.5vw,26px);color:var(--dim);font-variant-numeric:tabular-nums}
+
+/* счётчики */
+.counters{display:grid;grid-template-columns:repeat(4,1fr);gap:1.2vw;flex:none}
+.ct{background:var(--felt);border:1px solid var(--edge);border-radius:1.1vw;
+  padding:1.6vh 1.4vw;display:flex;flex-direction:column;gap:.5vh}
+.ct .n{font-family:var(--display);font-size:clamp(38px,7.4vw,138px);line-height:.8;
+  font-variant-numeric:tabular-nums}
+.ct.g{border-color:rgba(229,184,75,.42)}
+.ct.g .n{color:var(--gold)}
+.ct.g.lit{animation:lamp 2.4s ease-in-out infinite}
+@keyframes lamp{0%,100%{box-shadow:0 0 0 0 rgba(229,184,75,0)}50%{box-shadow:0 0 3.4vw 0 rgba(229,184,75,.2)}}
+
+/* середина */
+main{flex:1;display:grid;grid-template-columns:1.15fr 1fr;gap:1.2vw;min-height:0}
+.panel{background:var(--felt);border:1px solid var(--edge);border-radius:1.1vw;
+  padding:2vh 1.6vw;display:flex;flex-direction:column;min-height:0}
+.panel > .lbl{flex:none;margin-bottom:1.6vh}
+
+/* гистограмма */
+.bars{flex:1;display:flex;flex-direction:column;justify-content:space-evenly;gap:.7vh}
+.bar{display:grid;grid-template-columns:clamp(48px,5vw,92px) 1fr clamp(34px,3.4vw,66px);
+  align-items:center;gap:1.1vw}
+.bar .k{font-family:var(--mono);font-weight:700;font-size:clamp(11px,1.15vw,21px);color:var(--dim)}
+.bar .tr{height:clamp(12px,2.1vh,30px);background:var(--raise);border-radius:99px;overflow:hidden}
+.bar .fl{height:100%;background:var(--mint);border-radius:99px;width:0;
+  transition:width .9s cubic-bezier(.2,.8,.2,1)}
+.bar .v{font-family:var(--display);font-size:clamp(15px,1.9vw,36px);text-align:right;
+  font-variant-numeric:tabular-nums;line-height:1}
+.bar.jack .k,.bar.jack .v{color:var(--gold)}
+.bar.jack .fl{background:var(--gold)}
+.bar.off{opacity:.28}
+
+/* лента совпадений */
+.feed{flex:1;overflow:hidden;display:flex;flex-direction:column;gap:.6vh}
+.row{display:flex;align-items:center;gap:1vw;padding:.95vh 0;border-bottom:1px solid var(--edge);
+  animation:slide .5s ease both}
+@keyframes slide{from{opacity:0;transform:translateX(-14px)}to{opacity:1;transform:none}}
+.row .s{font-family:var(--display);font-size:clamp(15px,1.75vw,32px);color:var(--mint);
+  min-width:clamp(44px,4.4vw,84px);line-height:1}
+.row.j .s{color:var(--gold)}
+.row .p{font-family:var(--mono);font-size:clamp(11px,1.15vw,21px);color:var(--chalk);
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.empty{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;
+  color:var(--dim);font-size:clamp(12px,1.15vw,20px);line-height:1.7;padding:0 1vw}
+
+/* подвал */
+footer{flex:none;background:var(--felt);border:1px solid var(--edge);border-radius:1.1vw;
+  padding:1.5vh 1.6vw;display:flex;align-items:center;justify-content:space-between;gap:2vw}
+.tot{display:flex;gap:clamp(16px,2.6vw,52px);flex-wrap:wrap}
+.tot div{display:flex;align-items:baseline;gap:.6vw}
+.tot b{font-family:var(--display);font-size:clamp(17px,2vw,38px);line-height:1;
+  font-variant-numeric:tabular-nums}
+.tot .g{color:var(--gold)}
+#pulse{width:.62vw;height:.62vw;min-width:7px;min-height:7px;border-radius:50%;
+  background:var(--mint);opacity:.25;transition:opacity .3s}
+#pulse.on{opacity:1}
+
+#err{position:fixed;inset:auto 0 0 0;background:#3A1414;color:#FFD9D9;text-align:center;
+  padding:1.1vh;font-family:var(--mono);font-size:13px;display:none}
+@media(max-width:820px){ main{grid-template-columns:1fr} .counters{grid-template-columns:repeat(2,1fr)} }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <h1>ЛЮБОВНАЯ ЛОТЕРЕЯ</h1>
+    <span class="ev" id="ev">подключаемся…</span>
+  </div>
+  <div id="clock">--:--</div>
+</header>
+
+<div class="counters">
+  <div class="ct"><span class="lbl">В зале</span><span class="n" id="c-count">0</span></div>
+  <div class="ct"><span class="lbl">Сканов</span><span class="n" id="c-scans">0</span></div>
+  <div class="ct"><span class="lbl">Пар 4 и выше</span><span class="n" id="c-pairs">0</span></div>
+  <div class="ct g" id="c-jack-box"><span class="lbl">Джекпотов 6 из 6</span><span class="n" id="c-jack">0</span></div>
+</div>
+
+<main>
+  <section class="panel">
+    <span class="lbl">Расклад зала — сколько пар на каждом счёте</span>
+    <div class="bars" id="bars"></div>
+  </section>
+  <section class="panel">
+    <span class="lbl">Кто уже нашёлся</span>
+    <div class="feed" id="feed"></div>
+  </section>
+</main>
+
+<footer>
+  <div class="tot">
+    <div><span class="lbl">Игроков в базе</span><b id="t-users">0</b></div>
+    <div><span class="lbl">Игр сыграно</span><b id="t-events">0</b></div>
+    <div><span class="lbl">Сканов всего</span><b id="t-scans">0</b></div>
+    <div><span class="lbl">Джекпотов за всё время</span><b class="g" id="t-jack">0</b></div>
+  </div>
+  <div id="pulse"></div>
+</footer>
+
+<div id="err"></div>
+
+<script>
+/* URL веб-приложения Apps Script — тот же, что в index.html */
+const API = 'ВСТАВЬ_СЮДА_URL_ВЕБ_ПРИЛОЖЕНИЯ_APPS_SCRIPT';
+
+const P = new URLSearchParams(location.search);
+const EVENT = P.get('e') || '';
+const $ = s => document.querySelector(s);
+
+/* JSONP — обходит любые сложности с CORS у Apps Script */
+let jn = 0;
+function jsonp(params){
+  return new Promise((res, rej) => {
+    const cb = '__b' + (++jn);
+    const t = setTimeout(() => { cleanup(); rej(new Error('таймаут')); }, 12000);
+    function cleanup(){ clearTimeout(t); delete window[cb]; s.remove(); }
+    window[cb] = d => { cleanup(); res(d); };
+    const s = document.createElement('script');
+    s.src = API + '?' + new URLSearchParams(Object.assign({ callback: cb }, params));
+    s.onerror = () => { cleanup(); rej(new Error('нет связи')); };
+    document.head.appendChild(s);
+  });
+}
+
+function tick(){
+  const d = new Date();
+  $('#clock').textContent = String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
+}
+setInterval(tick, 1000); tick();
+
+function num(el, v){
+  const n = $(el); if (n.textContent === String(v)) return;
+  n.textContent = v;
+  n.animate([{transform:'scale(1)'},{transform:'scale(1.09)'},{transform:'scale(1)'}], {duration:340, easing:'ease-out'});
+}
+
+function paint(d){
+  $('#err').style.display = 'none';
+  $('#ev').textContent = d.event ? (d.event.title || d.event.code) : 'игра не выбрана';
+
+  num('#c-count', d.count || 0);
+  num('#c-scans', d.scans || 0);
+  num('#c-pairs', (d.pairs || []).length);
+  num('#c-jack',  d.jackpots || 0);
+  $('#c-jack-box').classList.toggle('lit', (d.jackpots || 0) > 0);
+
+  const dist = d.dist || {}, total = Object.values(dist).reduce((a,b)=>a+b, 0) || 1;
+  $('#bars').innerHTML = [6,5,4,3,2,1,0].map(n => {
+    const c = dist[n] || 0, w = Math.max(c ? 4 : 0, c / total * 100);
+    return '<div class="bar' + (n===6 ? ' jack':'') + (c ? '':' off') + '">' +
+      '<span class="k">' + n + ' из 6</span>' +
+      '<div class="tr"><i class="fl" style="width:' + w + '%"></i></div>' +
+      '<span class="v">' + c + '</span></div>';
+  }).join('');
+
+  const rows = (d.pairs || []).slice(0, 9);
+  $('#feed').innerHTML = rows.length
+    ? rows.map(p => '<div class="row' + (p.score===6 ? ' j':'') + '">' +
+        '<span class="s">' + p.score + '/6</span>' +
+        '<span class="p">@' + p.a + '  ×  @' + p.b + '</span></div>').join('')
+    : '<div class="empty">Пока никто не набрал 4 из 6.<br>Как только наберут — появятся здесь.</div>';
+
+  num('#t-users',  d.totalUsers  || 0);
+  num('#t-events', d.totalEvents || 0);
+  num('#t-scans',  d.totalScans  || 0);
+  num('#t-jack',   d.totalJackpots || 0);
+}
+
+async function poll(){
+  const p = $('#pulse'); p.classList.add('on');
+  try { paint(await jsonp({ board: EVENT })); }
+  catch(e){ $('#err').textContent = 'Нет связи с сервером: ' + e.message + '. Пробуем снова…'; $('#err').style.display = 'block'; }
+  finally { setTimeout(()=>p.classList.remove('on'), 500); }
+}
+poll();
+setInterval(poll, 5000);
+</script>
+</body>
+</html>
